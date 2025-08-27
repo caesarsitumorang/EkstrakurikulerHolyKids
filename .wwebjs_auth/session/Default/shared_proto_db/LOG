@@ -1,2 +1,3 @@
-2025/08/21-22:38:06.590 24ac Creating DB C:\laragon\www\ekstrakurikuler\.wwebjs_auth\session\Default\shared_proto_db since it was missing.
-2025/08/21-22:38:06.602 24ac Reusing MANIFEST C:\laragon\www\ekstrakurikuler\.wwebjs_auth\session\Default\shared_proto_db/MANIFEST-000001
+2025/08/27-14:34:06.668 40cc Reusing MANIFEST C:\laragon\www\ekstrakurikuler\.wwebjs_auth\session\Default\shared_proto_db/MANIFEST-000001
+2025/08/27-14:34:06.669 40cc Recovering log #3
+2025/08/27-14:34:06.670 40cc Reusing old log C:\laragon\www\ekstrakurikuler\.wwebjs_auth\session\Default\shared_proto_db/000003.log 
