@@ -1,0 +1,97 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f6f8;
+}
+
+.main-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.navbar {
+  background-color: #061f5b;
+  color: white;
+  padding: 20px 30px; /* tinggi ditambah */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  height: 45px; 
+}   
+
+
+.navbar-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.navbar-user {
+  font-size: 16px;
+}
+
+.dashboard-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 190px;
+  background-color: #082465;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar a {
+  color: white;
+  text-decoration: none;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.05); /* efek halus */
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.sidebar a:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.sidebar a.active {
+  background-color: yellowgreen; 
+  font-weight: bold;
+  color: black;
+  border-left: 4px solid white;
+}
+
+.logout {
+  margin-top: auto;
+}
+
+.logout a {
+  background-color: #e74c3c;
+  display: block;
+  text-align: center;
+  padding: 10px;
+  border-radius: 5px;
+  color: white;
+  text-decoration: none;
+}
+
+.logout a:hover {
+  background-color: #c0392b;
+}
+
+/* Konten */
+.content {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}

@@ -1,0 +1,173 @@
+/* ===== GLOBAL ===== */
+body {
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    background: #f9f9f9;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+}
+
+/* ===== HEADER ===== */
+.header_section {
+    background: #fff;
+    padding: 15px 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+.navbar-brand {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.navbar-nav .nav-link {
+    margin: 0 10px;
+    font-weight: 500;
+    color: #333;
+    transition: 0.3s;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #667eea;
+}
+
+.btn-login {
+    background: #667eea;
+    color: #fff !important;
+    padding: 8px 15px;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.btn-login:hover {
+    background: #5a6dd4;
+}
+
+
+.hero_detail-box h1 {
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+.hero_detail-box h3 {
+    font-size: 1.75rem;
+    margin-bottom: 20px;
+}
+
+.hero_detail-box p {
+    font-size: 1.1rem;
+}
+
+.hero_img-container img {
+    max-width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* ===== ABOUT & PRESTASI ===== */
+.about_section {
+    padding: 60px 0;
+}
+
+.about_section.bg-light {
+    background: #f2f2f2;
+}
+
+.main-heading {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.uniform-img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.uniform-img:hover {
+    transform: scale(1.05);
+}
+
+/* ===== LANDING ===== */
+.landing_section {
+    background: #fff;
+    padding: 60px 0;
+}
+
+.landing_detail {
+    font-size: 1.1rem;
+    color: #555;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* ===== BUTTON ===== */
+.call_to-btn {
+    display: inline-flex;
+    align-items: center;
+    background: #667eea;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.call_to-btn:hover {
+    background: #5a6dd4;
+}
+
+.call_to-btn i {
+    margin-left: 10px;
+}
+
+/* ===== FOOTER ===== */
+.footer_section {
+    background: #333;
+    color: #fff;
+    padding: 20px 0;
+    font-size: 14px;
+}
+
+.footer_section p {
+    margin: 5px 0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 767px) {
+    .hero_detail-box h1 {
+        font-size: 2.25rem;
+    }
+
+    .hero_detail-box h3 {
+        font-size: 1.5rem;
+    }
+
+    .uniform-img {
+        height: 180px;
+    }
+
+    .navbar-nav {
+        text-align: center;
+    }
+
+    .navbar-nav .nav-item {
+        margin-bottom: 10px;
+    }
+}
