@@ -2,11 +2,24 @@
 session_start();
 include '../../../../database/config.php';
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require '../../../../vendor/autoload.php';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id_ekstra      = $_POST['id_ekstra'];
-    $tanggal        = $_POST['tanggal'];
-    $status_list    = $_POST['status'];
+    $id_ekstra       = $_POST['id_ekstra'];
+    $tanggal         = $_POST['tanggal'];
+    $status_list     = $_POST['status'];
     $keterangan_list = $_POST['keterangan'];
+
+    // Ambil nama ekstrakurikuler
+    $ekstra_stmt = $conn->prepare("SELECT nama_ekstra FROM ekstrakurikuler WHERE id_ekstra = ?");
+    $ekstra_stmt->bind_param("i", $id_ekstra);
+    $ekstra_stmt->execute();
+    $ekstra_result = $ekstra_stmt->get_result();
+    $ekstra_row    = $ekstra_result->fetch_assoc();
+    $nama_ekstra   = $ekstra_row['nama_ekstra'] ?? 'Ekstrakurikuler';
 
     // Cek apakah absensi untuk tanggal & ekstra ini sudah ada
     $cek_ekstra = $conn->prepare("SELECT 1 FROM absensi_ekstrakurikuler WHERE id_ekstra = ? AND tanggal = ?");
@@ -15,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cek_result = $cek_ekstra->get_result();
 
     if ($cek_result->num_rows > 0) {
-        echo "<script>alert('Absensi untuk tanggal tersebut sudah dilakukan.'); window.location.href = '../dashboard_guru.php';</script>";
+        echo "<script>alert('Absensi untuk $nama_ekstra pada tanggal tersebut sudah dilakukan.'); window.location.href = '../dashboard_guru.php';</script>";
         exit;
     }
 
@@ -27,36 +40,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param("iisss", $id_siswa, $id_ekstra, $tanggal, $status, $keterangan);
         $stmt->execute();
 
-        // Ambil nama & no WA ortu
-        $wa_stmt = $conn->prepare("SELECT nama, no_hp_ortu FROM siswa WHERE id_siswa = ?");
-        $wa_stmt->bind_param("i", $id_siswa);
-        $wa_stmt->execute();
-        $wa_result = $wa_stmt->get_result();
+        // Ambil nama & email ortu
+        $email_stmt = $conn->prepare("SELECT nama, email_ortu FROM siswa WHERE id_siswa = ?");
+        $email_stmt->bind_param("i", $id_siswa);
+        $email_stmt->execute();
+        $email_result = $email_stmt->get_result();
 
-        if ($wa_row = $wa_result->fetch_assoc()) {
-            $nama_siswa = $wa_row['nama'];
-            $no_wa      = $wa_row['no_hp_ortu']; 
-            if (!empty($no_wa)) {
-                $message = "Yth. Orang Tua/Wali,\n\n".
-                           "Kami informasikan bahwa siswa atas nama $nama_siswa ".
-                           "pada tanggal $tanggal memiliki status kehadiran: $status.\n\n".
-                           "Keterangan: $keterangan\n\nTerima kasih.";
+        if ($email_row = $email_result->fetch_assoc()) {
+            $nama_siswa = $email_row['nama'];
+            $user_email = $email_row['email_ortu'];
 
-                $ch = curl_init("http://localhost:8000/send-message");
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_POST, true);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-                    "number"  => $no_wa,
-                    "message" => $message
-                ]));
-                $response = curl_exec($ch);
-                curl_close($ch);
+            if (empty($user_email)) {
+                echo "<script>alert('Email orang tua $nama_siswa tidak ditemukan!');</script>";
+                continue;
+            }
+
+            // Kirim email pakai PHPMailer
+            $mail = new PHPMailer(true);
+            try {
+                $mail->isSMTP();
+                $mail->Host       = 'smtp.gmail.com';
+                $mail->SMTPAuth   = true;
+                $mail->Username   = 'makrabimkaunika22@gmail.com'; // ganti
+                $mail->Password   = 'tgbuxihctlipwmvs';      // ganti
+                $mail->SMTPSecure = 'tls';
+                $mail->Port       = 587;
+
+                $mail->setFrom('makrabimkaunika22@gmail.com', 'Sekolah Ekstrakurikuler');
+                $mail->addAddress($user_email, "Orang Tua $nama_siswa");
+
+                $mail->isHTML(true);
+                $mail->Subject = "Absensi $nama_ekstra - $tanggal";
+                $mail->Body    = "
+                    <p>Yth. Orang Tua/Wali,</p>
+                    <p>Kami informasikan bahwa siswa atas nama <strong>$nama_siswa</strong> telah mengikuti kegiatan <strong>$nama_ekstra</strong> pada tanggal <strong>$tanggal</strong> dengan status kehadiran: <strong>$status</strong>.</p>
+                    <p><strong>Keterangan:</strong> $keterangan</p>
+                    <p>Terima kasih.</p>
+                ";
+
+                $mail->send();
+            } catch (Exception $e) {
+                echo "<script>alert('Gagal mengirim email ke $user_email: {$mail->ErrorInfo}');</script>";
             }
         }
     }
 
-    echo "<script>alert('Absensi berhasil disimpan dan notifikasi WA terkirim'); window.location.href = '../dashboard_guru.php';</script>";
+    echo "<script>alert('Absensi $nama_ekstra berhasil disimpan dan email notifikasi terkirim'); window.location.href = '../dashboard_guru.php';</script>";
 } else {
     header("Location: absensi_index.php");
     exit;
