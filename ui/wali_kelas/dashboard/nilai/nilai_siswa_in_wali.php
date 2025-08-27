@@ -124,10 +124,10 @@ $result = mysqli_query($conn, $query);
 <body>
   <div class="container">
     <div style="margin-bottom:20px; text-align:right;">
-    <a href="nilai/cetak_data_nilai.php" target="_blank" 
+    <!-- <a href="nilai/cetak_data_nilai.php" target="_blank" 
        style="background:#082465; color:white; padding:10px 16px; border-radius:6px; text-decoration:none; font-size:14px;">
       🖨 Cetak PDF
-    </a>
+    </a> -->
   </div>
     <h2>📊 Data Nilai Siswa Kelas <?= htmlspecialchars($nama_kelas) ?></h2>
     
@@ -155,7 +155,12 @@ $result = mysqli_query($conn, $query);
               <td><?= htmlspecialchars($row['nama_kelas']) ?></td>
               <td><?= $row['ekstrakurikuler'] ? htmlspecialchars($row['ekstrakurikuler']) : '<em>Belum terdaftar</em>' ?></td>
               <td><?= $row['jumlah_hadir'] !== null ? $row['jumlah_hadir'] : '<em>Belum diisi</em>' ?></td>
-              <td><?= $row['nilai_akhir'] !== null ? $row['nilai_akhir'] : '<em>Belum diisi</em>' ?></td>
+             <td>
+    <?= $row['nilai_akhir'] !== null 
+        ? number_format(min($row['nilai_akhir'], 100), 1, '.', '') 
+        : '<em>Belum diisi</em>' ?>
+</td>
+
             </tr>
           <?php endwhile; ?>
         <?php else: ?>

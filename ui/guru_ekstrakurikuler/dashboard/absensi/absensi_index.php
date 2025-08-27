@@ -33,6 +33,7 @@ $result = $stmt->get_result();
         <p><strong>Hari:</strong> <?= $row['hari'] ?> | <strong>Jam:</strong> <?= $row['jam'] ?></p>
         <p><strong>Lokasi:</strong> <?= $row['lokasi'] ?></p>
        <a href="absensi/absensi_form.php?id=<?= $row['id_ekstra'] ?>" class="btn-absen">➤ Kelola Absensi</a>
+       <a href="absensi/absensi_ditiadakan.php?id=<?= $row['id_ekstra'] ?>" class="btn-absen">➤ Infokan Kegiatan Jika Ditunda</a>
 
       </div>
     <?php endwhile; ?>

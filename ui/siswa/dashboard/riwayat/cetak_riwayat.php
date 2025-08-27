@@ -4,19 +4,37 @@ include '../../../../database/config.php';
 
 session_start();
 $id_siswa = $_SESSION['id_ref'];
+$tanggal_sekarang = date('Y-m-d');
 
-// 🔹 Ambil data wali kelas siswa
-$waliQuery = $conn->prepare("
-    SELECT g.nama_lengkap AS wali_kelas 
+// --- Ambil data kelas siswa ---
+$qKelas = $conn->prepare("
+    SELECT s.id_kelas, k.nama_kelas 
     FROM siswa s
-    JOIN guru g ON s.id_kelas = g.id_guru
+    JOIN kelas k ON s.id_kelas = k.id_kelas
     WHERE s.id_siswa = ?
 ");
-$waliQuery->bind_param("i", $id_siswa);
-$waliQuery->execute();
-$waliResult = $waliQuery->get_result();
-$waliData = $waliResult->fetch_assoc();
-$nama_wali = $waliData ? $waliData['wali_kelas'] : '-';
+$qKelas->bind_param("i", $id_siswa);
+$qKelas->execute();
+$rKelas = $qKelas->get_result();
+$dataKelas = $rKelas->fetch_assoc();
+
+$id_kelas   = $dataKelas['id_kelas'] ?? null;
+$nama_kelas = $dataKelas['nama_kelas'] ?? "-";
+
+// --- Ambil nama wali kelas berdasarkan kelas siswa ---
+$nama_wali_kelas = "-";
+$nohp_wali_kelas = "-";
+if ($id_kelas) {
+    $qWali = $conn->prepare("SELECT nama_lengkap, no_hp FROM wali_kelas WHERE id_kelas = ?");
+    $qWali->bind_param("i", $id_kelas);
+    $qWali->execute();
+    $rWali = $qWali->get_result();
+    if ($rowWali = $rWali->fetch_assoc()) {
+        $nama_wali_kelas = $rowWali['nama_lengkap'];
+        $nohp_wali_kelas = $rowWali['no_hp'];
+    }
+}
+
 
 // 🔹 Ambil semester terakhir
 $semResult = $conn->query("SELECT id, semester, tanggal_mulai, tanggal_selesai FROM semester ORDER BY id DESC LIMIT 1");
@@ -145,7 +163,12 @@ while ($row = $result->fetch_assoc()) {
         <td>' . htmlspecialchars($row['nama_guru']) . '</td>
         <td>' . htmlspecialchars($row['no_hp']) . '</td>
         <td style="text-align:center;">' . ($row['jumlah_hadir'] ?: 0) . '</td>
-        <td style="text-align:center;">' . ($row['nilai_akhir'] ?: '-') . '</td>
+       <td style="text-align:center;">' . 
+    ($row['nilai_akhir'] !== null 
+        ? rtrim(rtrim(number_format(min(100, $row['nilai_akhir']), 1), '0'), '.') 
+        : '-') 
+. '</td>
+
     </tr>';
     $nama_pembina = $row['nama_guru']; 
 }
@@ -164,10 +187,10 @@ $html .= '
 </div>
 <table class="signature-table">
 <tr>
-  <td>
+ <td>
     <p style="margin:0;">Wali Kelas</p>
     <br><br><br><br><br><br>
-    <p style="margin:0; font-weight:bold; text-decoration:underline;">' . htmlspecialchars($nama_wali) . '</p>
+    <p style="margin:0; font-weight:bold; text-decoration:underline;">' . htmlspecialchars($nama_wali_kelas) . '</p>
   </td>
   <td>
     <p style="margin:0;">Guru Pembina</p>

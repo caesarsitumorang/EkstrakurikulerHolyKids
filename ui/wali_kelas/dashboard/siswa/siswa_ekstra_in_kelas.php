@@ -104,11 +104,11 @@ $result = mysqli_query($conn, $query);
 <body>
   <div class="container">
     <div style="text-align:right; margin-bottom:15px;">
-  <a href="siswa/cetak_data_siswa.php" target="_blank" 
+  <!-- <a href="siswa/cetak_data_siswa.php" target="_blank" 
      style="background:#082465; color:#fff; padding:8px 16px; 
             text-decoration:none; border-radius:6px; font-size:14px;">
      🖨️ Cetak PDF
-  </a>
+  </a> -->
 </div>
 
    <h2>📋 Data Siswa Kelas <?= htmlspecialchars($nama_kelas) ?> & Ekstrakurikuler</h2>

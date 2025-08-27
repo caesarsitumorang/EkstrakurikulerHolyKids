@@ -8,19 +8,25 @@ if (!isset($_GET['id_ekstra'])) {
 
 $id_ekstra = (int)$_GET['id_ekstra'];
 
-// Ambil data siswa dan hitung kehadiran
 $query = "
     SELECT s.id_siswa, s.nama, s.nis, k.nama_kelas,
-    COUNT(a.status) AS jumlah_hadir
+           COUNT(a.status) AS jumlah_hadir,
+           COALESCE(MAX(n.nilai_akhir), '-') AS nilai_akhir
     FROM siswa_ekstrakurikuler se
     JOIN siswa s ON se.id_siswa = s.id_siswa
     JOIN kelas k ON s.id_kelas = k.id_kelas
-    LEFT JOIN absensi_ekstrakurikuler a ON a.id_siswa = s.id_siswa 
-        AND a.id_ekstra = se.id_ekstra AND a.status = 'hadir'
+    LEFT JOIN absensi_ekstrakurikuler a 
+           ON a.id_siswa = s.id_siswa 
+          AND a.id_ekstra = se.id_ekstra 
+          AND a.status = 'hadir'
+    LEFT JOIN nilai_siswa n 
+           ON n.id_siswa = s.id_siswa 
+          AND n.id_ekstra = se.id_ekstra
     WHERE se.id_ekstra = ?
-    GROUP BY s.id_siswa
+    GROUP BY s.id_siswa, s.nama, s.nis, k.nama_kelas
     ORDER BY s.nama ASC
 ";
+
 
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $id_ekstra);
@@ -31,9 +37,8 @@ $result = $stmt->get_result();
 <div class="wrapper">
   <div class="header-actions">
     <a href="../dashboard_guru.php" class="btn-back">← Kembali ke Dashboard</a>
-    <h2>📋 Data Kehadiran Siswa Ekstrakurikuler</h2>
-    <!-- Tombol Cetak PDF -->
-    <a href="../data_siswa/cetak_siswa.php?id_ekstra=<?= $id_ekstra ?>" class="btn-cetak">🖨️ Cetak PDF</a>
+    <h2>📋 Data Kehadiran & Nilai Siswa Ekstrakurikuler</h2>
+    <a href="../data_siswa/cetak_siswa.php?id_ekstra=<?= $id_ekstra ?>" class="btn-cetak">🖨 Cetak PDF</a>
   </div>
 
   <table>
@@ -44,6 +49,7 @@ $result = $stmt->get_result();
         <th>Nama</th>
         <th>Kelas</th>
         <th>Jumlah Hadir</th>
+        <th>Nilai Akhir</th>
       </tr>
     </thead>
     <tbody>
@@ -54,11 +60,18 @@ $result = $stmt->get_result();
         <td><?= htmlspecialchars($row['nama']) ?></td>
         <td><?= htmlspecialchars($row['nama_kelas']) ?></td>
         <td><?= $row['jumlah_hadir'] ?> dari 24</td>
+       <td>
+    <?= $row['nilai_akhir'] !== null 
+        ? round(min($row['nilai_akhir'], 100), 1) 
+        : '<em>Belum diisi</em>' ?>
+</td>
+
       </tr>
       <?php endwhile; ?>
     </tbody>
   </table>
 </div>
+
 
 <style>
 .wrapper {

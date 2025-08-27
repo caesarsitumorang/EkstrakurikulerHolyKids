@@ -5,21 +5,25 @@ include '../../../../database/config.php';
 $id_ekstra = $_GET['id_ekstra'] ?? 0;
 if (!$id_ekstra) { exit('Ekstrakurikuler tidak ditemukan.'); }
 
-// 🔹 Ambil data siswa & kehadiran
 $query = "
-    SELECT s.nama, s.nis, k.nama_kelas,
-           COUNT(a.status) AS jumlah_hadir
+    SELECT s.id_siswa, s.nama, s.nis, k.nama_kelas,
+           COUNT(a.status) AS jumlah_hadir,
+           COALESCE(MAX(n.nilai_akhir), '-') AS nilai_akhir
     FROM siswa_ekstrakurikuler se
     JOIN siswa s ON se.id_siswa = s.id_siswa
     JOIN kelas k ON s.id_kelas = k.id_kelas
     LEFT JOIN absensi_ekstrakurikuler a 
-        ON a.id_siswa = s.id_siswa 
-        AND a.id_ekstra = se.id_ekstra 
-        AND a.status = 'hadir'
+           ON a.id_siswa = s.id_siswa 
+          AND a.id_ekstra = se.id_ekstra 
+          AND a.status = 'hadir'
+    LEFT JOIN nilai_siswa n 
+           ON n.id_siswa = s.id_siswa 
+          AND n.id_ekstra = se.id_ekstra
     WHERE se.id_ekstra = ?
-    GROUP BY s.id_siswa
+    GROUP BY s.id_siswa, s.nama, s.nis, k.nama_kelas
     ORDER BY s.nama ASC
 ";
+
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $id_ekstra);
 $stmt->execute();
@@ -48,7 +52,7 @@ $mpdf->SetHTMLHeader($header);
 
 // 🔹 Judul
 $html = '<h3 style="text-align:center; margin-top:10px; margin-bottom:15px;">
-Data Kehadiran Siswa Ekstrakurikuler
+Data Kehadiran & Nilai Siswa Ekstrakurikuler
 </h3>';
 
 // 🔹 Style Tabel
@@ -83,6 +87,7 @@ $html .= '<table border="1">
     <th>Nama</th>
     <th>Kelas</th>
     <th>Jumlah Hadir</th>
+    <th>Nilai Akhir</th>
 </tr>
 </thead>
 <tbody>';
@@ -95,10 +100,16 @@ while($row = $result->fetch_assoc()){
         <td>'.$row['nama'].'</td>
         <td>'.$row['nama_kelas'].'</td>
         <td style="text-align:center;">'.$row['jumlah_hadir'].' dari 24</td>
+        <td style="text-align:center;">' . 
+    ($row['nilai_akhir'] !== null 
+        ? rtrim(rtrim(number_format(min(100, $row['nilai_akhir']), 1), '0'), '.') 
+        : '-') 
+. '</td>
     </tr>';
 }
 
 $html .= '</tbody></table>';
+
 
 // 🔹 Bagian Tanda Tangan di kanan bawah
 $html .= '

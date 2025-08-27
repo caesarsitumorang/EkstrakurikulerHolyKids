@@ -79,7 +79,9 @@ $stmt->bind_param("ii", $id_siswa, $id_siswa);
             <p><strong>No HP Guru:</strong> <?= htmlspecialchars($row['no_hp']) ?></p>
             <p class="date">Diterima sejak: <?= date('d M Y', strtotime($row['tanggal_daftar'])) ?></p>
             <p class="kehadiran"><strong>Jumlah Hadir:</strong> <?= $row['jumlah_hadir'] ?> dari 24</p>
-            <p><strong>Nilai Akhir:</strong> <?= $row['nilai_akhir'] ?? '-' ?></p>
+            <p><strong>Nilai Akhir:</strong> 
+              <?= $row['nilai_akhir'] !== null ? min(100, number_format($row['nilai_akhir'], 1)) : '-' ?>
+            </p>
             <a href="riwayat/detail_kehadiran.php?id_ekstra=<?= $row['id_ekstra'] ?>" class="btn-detail">Lihat Detail</a>
           </div>
         <?php endwhile; ?>
